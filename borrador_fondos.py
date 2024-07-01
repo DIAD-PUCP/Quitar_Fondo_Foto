@@ -10,8 +10,8 @@ from rembg import remove
 from PIL import Image
 from io import BytesIO
 import zipfile
-import tkinter as tk
-from tkinter import filedialog
+# import tkinter as tk
+# from tkinter import filedialog
 import os
 
 # -------------------------------------------------- Codigo Principal --------------------------------------------------
@@ -116,11 +116,11 @@ def main():
     try:
         st.title("Quitar fondo") # Titulo del programa
         files = st.file_uploader("Seleccione una o varias imagenes", accept_multiple_files=True, type=["png","jpg","jpeg", "tif", "webp"]) # Crea un boton para subir uno o varios archivos
-        st.write("O seleccione una carpeta")# Da la opcion de subir una carpeta entera
-        root = tk.Tk() # Crea una ventana en Tkinter (No se puede adjuntar en Streamlit carpetas enteras, asi que este es un metodo para lograrlo)
-        root.withdraw() # Oculta la ventana
-        root.wm_attributes('-topmost', 1) # Superpone la ventana sobre cualquier otro programa
-        boton_carpeta = st.button('Buscar Carpeta') # Crea un boton que permita adjuntar una carpeta 
+        # st.write("O seleccione una carpeta")# Da la opcion de subir una carpeta entera
+        # root = tk.Tk() # Crea una ventana en Tkinter (No se puede adjuntar en Streamlit carpetas enteras, asi que este es un metodo para lograrlo)
+        # root.withdraw() # Oculta la ventana
+        # root.wm_attributes('-topmost', 1) # Superpone la ventana sobre cualquier otro programa
+        # boton_carpeta = st.button('Buscar Carpeta') # Crea un boton que permita adjuntar una carpeta 
     except ValueError:
         print('No se pudo cargar el Streamlit correctamente') # Manejo de errores
     if files:
@@ -128,12 +128,12 @@ def main():
             img_remover(files, '1', None, 300) # Abrir los archivos y ejecutar las funcion segun los parametros necesarios
         except ValueError:
             print('Error mientras se editaba la imagen') # Manejo de errores
-    elif boton_carpeta:
-        try:
-            dirname = str(filedialog.askdirectory(master=root)) # Obtener la ruta de la carpeta subida
-            img_remover(os.listdir(dirname), '0', dirname, 300) # Abrir la carpeta y ejecutar las funcion segun los parametros necesarios
-        except ValueError:
-            print('Error mientras se editaba la imagen') # Manejo de errores
+    # elif boton_carpeta:
+    #     try:
+    #         dirname = str(filedialog.askdirectory(master=root)) # Obtener la ruta de la carpeta subida
+    #         img_remover(os.listdir(dirname), '0', dirname, 300) # Abrir la carpeta y ejecutar las funcion segun los parametros necesarios
+    #     except ValueError:
+    #         print('Error mientras se editaba la imagen') # Manejo de errores
 
 if __name__ == "__main__":
     main()
