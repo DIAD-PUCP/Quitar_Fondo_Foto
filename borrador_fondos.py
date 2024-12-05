@@ -6,7 +6,7 @@
 # -------------------------------------------------- Importacion de librerias --------------------------------------------------
 
 import streamlit as st
-from rembg import remove
+from rembg import remove, new_session
 from PIL import Image
 from io import BytesIO
 import zipfile
@@ -56,7 +56,7 @@ def resize_image(img, target_width, target_height):
 
     return resized_img, target_width, target_height
 
-def img_remover(files, set, dirname, dpi): # Funcion que quita el fondo de las imagenes y las guarda en formato .png
+def img_remover(files, set, dirname, dpi, session): # Funcion que quita el fondo de las imagenes y las guarda en formato .png
     # Parametros: files (Archivo o archivos subidos), set (1 si es para archivos, 0 si es para carpetas)
     names = [] # Lista que contendra los nombres de los archivos
     images = [] # Lista que almacenara las imagenes editadas
@@ -72,7 +72,7 @@ def img_remover(files, set, dirname, dpi): # Funcion que quita el fondo de las i
             path = os.path.join(dirname, file) # Si se sube una carpeta, se define la ruta de los archivos
             img = Image.open(path) # Se abren los archivos
             names.append(file.split(".")[0] + '.png')  # Se incluye en nombre del archivo
-        img2 = remove(img, bgcolor=(255,255,255,255)) # Remueve el fondo de la imagen
+        img2 = remove(img, bgcolor=(255,255,255,255),session=session) # Remueve el fondo de la imagen
 
     # Ajustando el tamaño simétricamente con las dimensiones específicas
        # Desempaquetar los valores devueltos por resize_image
@@ -115,6 +115,8 @@ def img_remover(files, set, dirname, dpi): # Funcion que quita el fondo de las i
 def main():
     try:
         st.title("Quitar fondo") # Titulo del programa
+        model = st.selectbox("Modelo:",['u2net','u2net_human_seg','birefnet-portrait'])
+        session = new_session(model_name=model)
         files = st.file_uploader("Seleccione una o varias imagenes", accept_multiple_files=True, type=["png","jpg","jpeg", "tif", "webp"]) # Crea un boton para subir uno o varios archivos
         # st.write("O seleccione una carpeta")# Da la opcion de subir una carpeta entera
         # root = tk.Tk() # Crea una ventana en Tkinter (No se puede adjuntar en Streamlit carpetas enteras, asi que este es un metodo para lograrlo)
@@ -125,7 +127,7 @@ def main():
         print('No se pudo cargar el Streamlit correctamente') # Manejo de errores
     if files:
         try:
-            img_remover(files, '1', None, 300) # Abrir los archivos y ejecutar las funcion segun los parametros necesarios
+            img_remover(files, '1', None, 300, session) # Abrir los archivos y ejecutar las funcion segun los parametros necesarios
         except ValueError:
             print('Error mientras se editaba la imagen') # Manejo de errores
     # elif boton_carpeta:
