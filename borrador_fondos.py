@@ -112,11 +112,15 @@ def img_remover(files, set, dirname, dpi, session): # Funcion que quita el fondo
             label="Descargar Archivo ZIP", data=zip_data, file_name=zip_filename, mime="application/zip"
         ) # Muestra en la interfaz un boton para descargar el archivo en un .zip
 
+@st.cache_resource
+def get_model_session(model_name):
+    return new_session(model_name=model_name)
+
 def main():
     try:
         st.title("Quitar fondo") # Titulo del programa
         model = st.selectbox("Modelo:",['u2net','u2net_human_seg','birefnet-portrait'])
-        session = new_session(model_name=model)
+        session = get_model_session(model)
         files = st.file_uploader("Seleccione una o varias imagenes", accept_multiple_files=True, type=["png","jpg","jpeg", "tif", "webp"]) # Crea un boton para subir uno o varios archivos
         # st.write("O seleccione una carpeta")# Da la opcion de subir una carpeta entera
         # root = tk.Tk() # Crea una ventana en Tkinter (No se puede adjuntar en Streamlit carpetas enteras, asi que este es un metodo para lograrlo)
