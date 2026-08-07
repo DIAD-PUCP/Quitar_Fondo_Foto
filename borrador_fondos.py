@@ -29,7 +29,9 @@ def create_zip_file(images, zip_filename, names):  # Funcion que crea un archivo
                 img_bytes = (
                     BytesIO()
                 )  # Objeto que almacena el contenido de las imagenes creadas
-                img.save(img_bytes, format="PNG")  # Guarda las imagenes en formato .png
+                img.save(
+                    img_bytes, format="jpeg", dpi=(300, 300)
+                )  # Guarda las imagenes en formato .png
                 img_bytes.seek(
                     0
                 )  # Se vuelve la escritura del fichero al inicio de la lista
@@ -82,7 +84,7 @@ def resize_image(img, target_width, target_height):
 
 @st.cache_data()
 def img_remover(
-    files, set, dirname, dpi, session
+    files, set, dirname, dpi, _session
 ):  # Funcion que quita el fondo de las imagenes y las guarda en formato .png
     # Parametros: files (Archivo o archivos subidos), set (1 si es para archivos, 0 si es para carpetas)
     names = []  # Lista que contendra los nombres de los archivos
@@ -107,7 +109,7 @@ def img_remover(
                 file
             )  # Si se sube un archivo o archivos, se abre solo con el nombre del archivo
             names.append(
-                file.name.split(".")[0] + ".png"
+                file.name.split(".")[0] + ".jpg"
             )  # Se incluye en nombre del archivo
         elif set == "0":
             path = os.path.join(
@@ -115,10 +117,10 @@ def img_remover(
             )  # Si se sube una carpeta, se define la ruta de los archivos
             img = Image.open(path)  # Se abren los archivos
             names.append(
-                file.split(".")[0] + ".png"
+                file.split(".")[0] + ".jpg"
             )  # Se incluye en nombre del archivo
         img2 = remove(
-            img, bgcolor=(255, 255, 255, 255), session=session
+            img, bgcolor=(255, 255, 255, 255), session=_session
         )  # Remueve el fondo de la imagen
 
         # Ajustando el tamaño simétricamente con las dimensiones específicas
@@ -134,7 +136,9 @@ def img_remover(
 
         while True:
             img_bytes = BytesIO()
-            img3.save(img_bytes, format="PNG", quality=quality, dpi=(dpi, dpi))
+            img3.convert("RGB").save(
+                img_bytes, format="jpeg", quality=quality, dpi=(dpi, dpi)
+            )
             size_kb = len(img_bytes.getvalue()) / 1024
             if size_kb <= max_size_kb or quality <= 0:
                 break
@@ -143,7 +147,9 @@ def img_remover(
         images.append(img3)  # Se adiciona la imagen creada a la lista de imagenes
         st.image(img3)  # Muestra la imagen en la interfaz
         buf = BytesIO()  # Objeto que permite almacenar el contenido de las imagenes
-        img3.save(buf, format="jpg")  # Guardar las imagenes en formato .png
+        img3.convert("RGB").save(
+            buf, format="jpeg", dpi=(dpi, dpi)
+        )  # Guardar las imagenes en formato .png
 
     if len(files) == 1:
         st.download_button(
