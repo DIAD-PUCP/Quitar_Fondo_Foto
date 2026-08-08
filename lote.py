@@ -1,7 +1,7 @@
 import os
 
+import rembg
 from PIL import Image
-from rembg import new_session, remove
 from tqdm import tqdm
 
 
@@ -35,15 +35,34 @@ def resize_image(img, target_width, target_height):
 
 
 def main():
-    s = new_session(model_name="birefnet-portrait")
+    providers = [
+        (
+            "TensorrtExecutionProvider",
+            {
+                "trt_fp16_enable": True,  # <-- ENABLES FP16
+                "trt_max_workspace_size": 1 << 30,  # 1 GB workspace
+                "trt_engine_cache_enable": True,  # Cache the built engine
+                "trt_engine_cache_path": "./trt_cache",  # Cache folder
+            },
+        ),
+        ("CUDAExecutionProvider", {}),  # Fallback if TensorRT fails
+    ]
+    s = rembg.new_session(
+        model_name="birefnet-portrait",
+        providers=providers,
+    )
     input_dir = "inputs"
     outpur_dir = "outputs"
     files = (f"{input_dir}/{file}" for file in os.listdir(input_dir))
     for file in tqdm(files):
         img = Image.open(file)
-        img2 = resize_image(img, 240, 288)
-        img3 = remove(img2)
-        img3.save(f"{outpur_dir}/{file[:-4]}.jpg", format="jpeg", dpi=(300, 300))
+        # img2, _, _ = resize_image(img, 240, 288)
+        img2 = rembg.remove(img, session=s, bgcolor=(255, 255, 255, 255))
+        img2.convert("RGB").save(
+            f"{outpur_dir}/{file[len(input_dir) + 1 : -4]}.jpg",
+            format="jpeg",
+            dpi=(300, 300),
+        )
 
 
 if __name__ == "__main__":
